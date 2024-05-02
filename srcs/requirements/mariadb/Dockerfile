@@ -1,2 +1,2 @@
 
-FROM debian:buster
+FROM debian:bullseye

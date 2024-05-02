@@ -1,11 +1,16 @@
 # Base image for Docker container.
-FROM debian:buster
+FROM debian:bullseye
+
+# Working directory.
+WORKDIR /home
 
 # Transfers the script to container's local bin.
-COPY nginx.sh /usr/local/bin/nginx.sh
+COPY tools/nginx_dependencies.sh /usr/local/bin/nginx_dependencies.sh
 
+# Listening connections on exposed port;
 EXPOSE 443
 
-RUN /usr/local/bin/nginx.sh
-# ENTRYPOINT ["/usr/local/bin/nginx.sh"]
+RUN	chmod +x /usr/local/bin/nginx_dependencies.sh
+RUN /usr/local/bin/nginx_dependencies.sh
+
 CMD ["nginx", "-g", "daemon off;"]

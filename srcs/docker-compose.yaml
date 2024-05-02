@@ -1,0 +1,20 @@
+# https://docs.docker.com/compose/gettingstarted/
+# https://hackmd.io/@jpshafto/SJnFqs-Kd
+# https://stackoverflow.com/questions/42216017/docker-compose-restart-policy
+
+version: '3.8'
+
+services:
+
+  nginx:
+    build:
+      # Where the Dockerfile is located.
+      context: ./requirements/nginx/
+      # Dockerfile name *not required if already named 'Dockerfile'.
+      dockerfile: Dockerfile
+    # Custoim name for the image being built.
+    image: nginx-build:inception
+    container_name: nginx
+    ports:
+      - "8080:80"
+    restart: on-failure:5
