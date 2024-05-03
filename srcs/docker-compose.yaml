@@ -2,8 +2,28 @@
 # https://hackmd.io/@jpshafto/SJnFqs-Kd
 # https://stackoverflow.com/questions/42216017/docker-compose-restart-policy
 
+
 version: '3.8'
 
+#-------------------------------------------------------------------------------
+# https://kinsta.com/blog/docker-compose-volumes/
+
+volumes:
+  volume-wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ppaquet/data/volume-wordpress
+      o: bind
+
+  volume-mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ppaquet/data/volume-mariadb
+
+#-------------------------------------------------------------------------------
 services:
 
   nginx:
@@ -12,9 +32,11 @@ services:
       context: ./requirements/nginx/
       # Dockerfile name *not required if already named 'Dockerfile'.
       dockerfile: Dockerfile
-    # Custoim name for the image being built.
+    # Custom name for the image being built.
     image: nginx-build:inception
     container_name: nginx
     ports:
       - "8080:80"
     restart: on-failure:5
+    volumes:
+      - volume-mariadb:/home/
