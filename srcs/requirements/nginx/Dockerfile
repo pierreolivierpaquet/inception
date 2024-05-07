@@ -13,4 +13,5 @@ EXPOSE 443
 RUN	chmod +x /usr/local/bin/nginx_dependencies.sh
 RUN /usr/local/bin/nginx_dependencies.sh
 
+# Makes sure to run nginx foreground (main process).
 CMD ["nginx", "-g", "daemon off;"]

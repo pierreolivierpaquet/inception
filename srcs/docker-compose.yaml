@@ -2,7 +2,6 @@
 # https://hackmd.io/@jpshafto/SJnFqs-Kd
 # https://stackoverflow.com/questions/42216017/docker-compose-restart-policy
 
-
 version: '3.8'
 
 #-------------------------------------------------------------------------------
@@ -10,6 +9,7 @@ version: '3.8'
 
 volumes:
   volume-wordpress:
+    name: volume-wordpress
     driver: local
     driver_opts:
       type: none
@@ -17,13 +17,29 @@ volumes:
       o: bind
 
   volume-mariadb:
+    name: volume-mariadb
     driver: local
     driver_opts:
       type: none
-      o: bind
       device: /home/ppaquet/data/volume-mariadb
+      o: bind
 
-#-------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------- #
+# https://stackoverflow.com/questions/38088279/communication-between-multiple-docker-compose-projects
+
+networks:
+  inception:
+    name: inception
+    driver: bridge
+    # IP address management.
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.0.0/16"
+          gateway: "192.168.0.1"
+
+# ---------------------------------------------------------------------------- #
+
 services:
 
   nginx:
@@ -39,4 +55,34 @@ services:
       - "8080:80"
     restart: on-failure:5
     volumes:
-      - volume-mariadb:/home/
+      - volume-wordpress:/home/
+    networks:
+      - inception
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress/
+      dockerfile: Dockerfile
+    image: wordpress-build:inception
+    container_name: wordpress
+    expose:
+      - "9000"
+    restart: on-failure:5
+    volumes:
+      - volume-wordpress:/usr/
+    networks:
+      - inception
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: Dockerfile
+    image: mariadb-build:inception
+    container_name: mariadb
+    expose:
+      - "3306"
+    restart: on-failure:5
+    volumes:
+      - volume-mariadb:/tmp/
+    networks:
+      - inception
