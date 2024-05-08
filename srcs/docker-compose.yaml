@@ -29,9 +29,11 @@ volumes:
 
 networks:
   inception:
+    # Prevents that directory name be append to the network's name
+    # (when executing 'docker-compose' without specifying -f <path>)
     name: inception
     driver: bridge
-    # IP address management.
+    # IP Address Management.
     ipam:
       driver: default
       config:
@@ -50,6 +52,8 @@ services:
       dockerfile: Dockerfile
     # Custom name for the image being built.
     image: nginx-build:inception
+    # Prevents that directory name be append to the service's name
+    # (when executing 'docker-compose' without specifying -f <path>)
     container_name: nginx
     ports:
       - "8080:80"
