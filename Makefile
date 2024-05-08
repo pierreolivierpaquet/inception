@@ -1,63 +1,91 @@
 
+SEP := "--------------------------------------------------------------------------------------------"
+
 all: up
 
 up:
-	@docker-compose -f srcs/docker-compose.yaml up --build -d
+	@echo $(SEP)
+	@echo "docker-compose's progression logged into 'docker-compose.log'\n"
+	@docker-compose -f srcs/docker-compose.yaml up --build -d 2>&1 | tee -a docker-compose.log | bar > /dev/null
 
 down:
 	@docker-compose -f srcs/docker-compose.yaml down
 
+# Stops the running processes using any NGINX, MARIADB, WORDPRESS (original/custom) image.
 stop:
-	@if docker ps | grep nginx 1>/dev/null; then \
-		echo -n "Stopping -> "; \
-		docker stop nginx; \
-	fi
-	@if docker ps | grep mariadb 1>/dev/null; then \
-		echo -n "Stopping -> "; \
-		docker stop mariadb; \
-	fi
-	@if docker ps | grep wordpress 1>/dev/null; then \
-		echo -n "Stopping -> "; \
-		docker stop wordpress; \
+	@if docker ps --format {{.Image}} | grep -q nginx; then \
+		echo "$(SEP)"; \
+		echo "Stopped Containers [ nginx ]:"; \
+		docker stop $$(docker ps --format "{{.ID}}\t{{.Image}}" | grep nginx | awk '{print $$1}') ; \
 	fi
 
+	@if docker ps --format {{.Image}} | grep -q mariadb; then \
+		echo "$(SEP)"; \
+		echo "Stopped Containers [ mariadb ]:"; \
+		docker stop $$(docker ps --format "{{.ID}}\t{{.Image}}" | grep mariadb | awk '{print $$1}') ; \
+	fi
+
+	@if docker ps --format {{.Image}} | grep -q wordpress; then \
+		echo "$(SEP)"; \
+		echo "Stopped Containers [ wordpress ]:"; \
+		docker stop $$(docker ps --format "{{.ID}}\t{{.Image}}" | grep wordpress | awk '{print $$1}') ; \
+	fi
+
+# Definitely removes any process (running/stopped) using NGINX, MARIADB, WORDPRESS image.
 clean: stop
-	@if docker ps -a | grep nginx 1>/dev/null; then \
-		echo -n "Removing -> "; \
-		docker rm -f nginx; \
-	fi
-	@if docker ps -a | grep mariadb 1>/dev/null; then \
-		echo -n "Removing -> "; \
-		docker rm -f mariadb; \
-	fi
-	@if docker ps -a | grep wordpress 1>/dev/null; then \
-		echo -n "Removing -> "; \
-		docker rm -f wordpress; \
+	@if docker ps -a --format "{{.Image}}" | grep -q "nginx"; then \
+		echo "$(SEP)"; \
+		echo "Deleted processes [ nginx ]:"; \
+		docker rm -f $$(docker ps -a --format "{{.ID}}\t{{.Image}}" | grep "nginx" | awk '{print $$1}') ; \
 	fi
 
-fclean:
-	
+	@if docker ps -a --format "{{.Image}}" | grep -q "mariadb"; then \
+		echo "$(SEP)"; \
+		echo "Deleted processes [ mariadb ]:"; \
+		docker rm -f $$(docker ps -a --format "{{.ID}}\t{{.Image}}" | grep "mariadb" | awk '{print $$1}') ; \
+	fi
 
-# RESULT=$(shell docker ps -qa)
-destroy:
-	@if [ $(shell docker ps -qa | head -n 1) ]; then \
-		echo "[ Removing processes: ]"; \
+	@if docker ps -a --format "{{.Image}}" | grep -q wordpress; then \
+		echo "$(SEP)"; \
+		echo "Deleted processes [ wordpress ]:"; \
+		docker rm -f $$(docker ps -a --format "{{.ID}}\t{{.Image}}" | grep "wordpress" | awk '{print $$1}') ; \
+	fi
+
+fclean: clean
+	@if docker images --format {{.Repository}} | grep -q "nginx"; then \
+		docker image rm $$(docker images --format "{{.ID}}\t{{.Repository}}" | grep "nginx" | awk '{print $$1}'); \
+	fi
+
+	@if docker images --format {{.Repository}} | grep -q "mariadb"; then \
+		docker image rm $$(docker images --format "{{.ID}}\t{{.Repository}}" | grep "mariadb" | awk '{print $$1}'); \
+	fi
+
+	@if docker images --format {{.Repository}} | grep -q "wordpress"; then \
+		docker image rm $$(docker images --format "{{.ID}}\t{{.Repository}}" | grep "wordpress" | awk '{print $$1}'); \
+	fi
+
+# Destroys all processes, removes all image(s), custom network(s), volume(s).
+purge:
+	@if [ -n "$(shell docker ps -qa)" ]; then \
+		echo "$(SEP)"; \
+		echo "Deleted Processes:"; \
 		docker rm -f $$(docker ps -a --format {{.Names}}); \
 	fi
 
-	@if [ $(shell docker images --format {{.ID}} | head -n 1) ]; then \
-		echo "[ Removing images ]"; \
-		# docker image rm $$(docker image ls --format {{.ID}}); \
+	@if [ -n "$(shell docker images --format {{.ID}})" ]; then \
+		echo "$(SEP)"; \
 		docker image prune -af; \
 	fi
 
-	@if [ $(shell docker volume ls --format {{.Name}} | head -n 1) ]; then \
-		echo ""; \
+	@if [ -n "$(shell docker volume ls --format {{.Name}})" ]; then \
+		echo "$(SEP)"; \
+		echo "Deleted Volumes:"; \
 		docker volume rm $$(docker volume ls --format {{.Name}}); \
 	fi
 
-	@if [ $(shell docker network ls --filter type=custom --format {{.Name}} | head -n 1 ) ]; then \
-		docker network prune -f ; \
+	@if [ -n "$(shell docker network ls --filter type=custom --format {{.Name}})" ]; then \
+		echo "$(SEP)"; \
+		docker network prune -f; \
 	fi
 
 pdf:
