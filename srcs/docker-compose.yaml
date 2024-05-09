@@ -55,38 +55,49 @@ services:
     # Prevents that directory name be append to the service's name
     # (when executing 'docker-compose' without specifying -f <path>)
     container_name: nginx
+    restart: on-failure:5
     ports:
       - "8080:80"
-    restart: on-failure:5
     volumes:
       - volume-wordpress:/home/
+    # networks:
+    #   - inception
     networks:
-      - inception
+      inception:
+        ipv4_address: "192.168.42.2"
 
+# https://hub.docker.com/_/wordpress
   wordpress:
     build:
       context: ./requirements/wordpress/
       dockerfile: Dockerfile
     image: wordpress-build:inception
     container_name: wordpress
+    restart: always
     expose:
       - "9000"
-    restart: on-failure:5
     volumes:
       - volume-wordpress:/usr/
+    # networks:
+    #   - inception
     networks:
-      - inception
+      inception:
+        ipv4_address: "192.168.42.3"
 
+# https://hub.docker.com/_/mariadb
   mariadb:
     build:
       context: ./requirements/mariadb/
       dockerfile: Dockerfile
     image: mariadb-build:inception
     container_name: mariadb
+    restart: always
     expose:
       - "3306"
-    restart: on-failure:5
     volumes:
       - volume-mariadb:/tmp/
+    # networks:
+    #   - inception
     networks:
-      - inception
+      inception:
+        ipv4_address: "192.168.42.4"
