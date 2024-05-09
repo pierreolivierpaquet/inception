@@ -2,4 +2,4 @@
 .env
 *.txt
 a.out
-docker-compose.log
+./docker-compose.log
