@@ -56,10 +56,11 @@ services:
     # (when executing 'docker-compose' without specifying -f <path>)
     container_name: nginx
     restart: on-failure:5
+    # Allows HOST to communicate with container.
     ports:
       - "8080:80"
     volumes:
-      - volume-wordpress:/home/
+      - volume-wordpress:/var/www/html
     # networks:
     #   - inception
     networks:
@@ -74,10 +75,12 @@ services:
     image: wordpress-build:inception
     container_name: wordpress
     restart: always
+    # Only allows inter-container communications. (Not with HOST)
+    # Exposes ports from a service to other services in the same Docker network.
     expose:
       - "9000"
     volumes:
-      - volume-wordpress:/usr/
+      - volume-wordpress:/var/www/html
     # networks:
     #   - inception
     networks:
