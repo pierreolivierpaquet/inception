@@ -6,8 +6,6 @@ FROM debian:bullseye
 # Working directory (where the commands are executed).
 WORKDIR /home
 
-COPY config/default /etc/nginx/sites-available/.
-
 # Transfers the installation script into container's local bin.
 COPY tools/nginx_dependencies.sh /usr/local/bin/nginx_dependencies.sh
 
@@ -16,6 +14,8 @@ EXPOSE 443
 
 RUN	chmod +x /usr/local/bin/nginx_dependencies.sh
 RUN /usr/local/bin/nginx_dependencies.sh
+
+COPY config/default /etc/nginx/sites-available/
 
 # Makes sure to run nginx foreground (main process).
 #	< -g > : setting up configurations that apply across your entire NGINX environment.
