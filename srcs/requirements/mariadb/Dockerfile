@@ -8,4 +8,7 @@ COPY tools/mariadb_dependencies.sh /usr/local/bin/mariadb_dependencies.sh
 RUN chmod +x /usr/local/bin/mariadb_dependencies.sh
 RUN /usr/local/bin/mariadb_dependencies.sh
 
+COPY ./config/50-server.cnf /etc/mysql/mariadb.conf.d/
+
+# CMD ["tail", "-f", "/dev/urandom"]
 CMD ["mysqld"]
