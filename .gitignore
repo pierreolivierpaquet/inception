@@ -1,4 +1,7 @@
-.env
+# .env
+# *.env
+# secrets
+
 *.txt
 a.out
 docker-compose.log
