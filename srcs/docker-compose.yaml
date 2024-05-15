@@ -107,10 +107,14 @@ services:
       dockerfile: Dockerfile
     image: mariadb-build:inception
     secrets:
-      - db_name
-      - db_user
-      - db_pw_user
-      - db_pw_root
+      - source: db_name
+        target: /run/secrets/db_name
+      - source: db_user
+        target: /run/secrets/db_user
+      - source: db_pw_user
+        target: /run/secrets/db_pw_user
+      - source: db_pw_root
+        target: /run/secrets/db_pw_root
     environment:
       DB_NAME_FILE: /run/secrets/db_name
       DB_USER_FILE: /run/secrets/db_user

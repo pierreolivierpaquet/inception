@@ -12,9 +12,10 @@ DB_INIT_FILE="/usr/local/bin/init.sql"
 # Current script automatically stops if any command returns a non-zero exit status.
 set -e
 
-if [ ! -d "/var/lib/mysql/$(cat ${SECRET_PATH}db_name)" ]; then \
+if [ ! -d "/var/lib/mysql/$(cat ${SECRET_PATH}db_name)" ]; then
 
-	mysqld_safe
+	# mysqld_safe
+	service mariadb start
 
 	touch ${DB_INIT_FILE}
 	echo "CREATE DATABASE IF NOT EXISTS \`$(cat ${SECRET_PATH}db_name)\`;" >> ${DB_INIT_FILE}
@@ -23,11 +24,15 @@ if [ ! -d "/var/lib/mysql/$(cat ${SECRET_PATH}db_name)" ]; then \
 
 	# https://www.ibm.com/docs/en/spectrum-lsf-rtm/10.2.0?topic=ssl-configuring-default-root-password-mysqlmariadb
 	# Adds a password to root.
-	echo "ALTER USER root@'localhost' IDENTIFIED BY '$(cat ${SECRET_PATH}db_pw_root)';" >> ${DB_INIT_FILE}
+	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$(cat ${SECRET_PATH}db_pw_root)';" >> ${DB_INIT_FILE}
 	echo "FLUSH PRIVILEGES;" >> ${DB_INIT_FILE}
 
-	mysqladmin -u root -p"$DB_ROOT" -S /var/run/mysqld/mysqld.sock shutdown
+	touch /root/3.here
 
-	mkdir -p /run/mysqld
+	mysql < ${DB_INIT_FILE}
+
+	mysqladmin -u root -p$(cat ${SECRET_PATH}db_pw_root) -S /var/run/mysqld/mysqld.sock shutdown
+
+	mkdir -p /run/mysqld # already exists due to service mariadb start
 
 fi
