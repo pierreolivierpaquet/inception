@@ -2,8 +2,6 @@
 # https://hackmd.io/@jpshafto/SJnFqs-Kd
 # https://stackoverflow.com/questions/42216017/docker-compose-restart-policy
 
-version: '3.8'
-
 #-------------------------------------------------------------------------------
 # https://kinsta.com/blog/docker-compose-volumes/
 
@@ -45,13 +43,13 @@ networks:
 
 secrets:
   db_name:
-    file: ../secrets/db_name.txt
+    file: ../secrets/${DB_NAME_SECRET}
   db_user:
-    file: ../secrets/db_user.txt
+    file: ../secrets/${DB_USER_SECRET}
   db_pw_user:
-    file: ../secrets/db_pw_user.txt
+    file: ../secrets/${DB_PW_USER_SECRET}
   db_pw_root:
-    file: ../secrets/db_pw_root.txt
+    file: ../secrets/${DB_PW_ROOT_SECRET}
 
 # ---------------------------------------------------------------------------- #
 
@@ -75,8 +73,6 @@ services:
     volumes:
       - volume-wordpress:/var/www/html
     networks:
-      - inception
-    networks:
       inception:
         ipv4_address: "192.168.42.2"
 
@@ -95,8 +91,6 @@ services:
     volumes:
       - volume-wordpress:/var/www/html
     networks:
-      - inception
-    networks:
       inception:
         ipv4_address: "192.168.42.3"
 
@@ -107,27 +101,18 @@ services:
       dockerfile: Dockerfile
     image: mariadb-build:inception
     secrets:
-      - source: db_name
-        target: /run/secrets/db_name
-      - source: db_user
-        target: /run/secrets/db_user
-      - source: db_pw_user
-        target: /run/secrets/db_pw_user
-      - source: db_pw_root
-        target: /run/secrets/db_pw_root
-    environment:
-      DB_NAME_FILE: /run/secrets/db_name
-      DB_USER_FILE: /run/secrets/db_user
-      DB_PW_USER_FILE: /run/secrets/db_pw_user
-      DB_PW_ROOT_FILE: /run/secrets/db_pw_root
+      - ${DB_NAME_SECRET}
+      - ${DB_USER_SECRET}
+      - ${DB_PW_USER_SECRET}
+      - ${DB_PW_ROOT_SECRET}
+    env_file:
+      - ./.env
     container_name: mariadb
     restart: always
     expose:
       - "3306"
     volumes:
       - volume-mariadb:/tmp/
-    networks:
-      - inception
     networks:
       inception:
         ipv4_address: "192.168.42.4"

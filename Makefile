@@ -15,14 +15,14 @@ up:
 	fi
 
 	@echo $(SEP)
-	@echo "docker-compose logged into 'docker-compose.log'\n"
-	@docker-compose -f srcs/docker-compose.yaml up --build -d 2>&1 | tee -a docker-compose.log | bar > /dev/null
+	@echo "docker compose logged into 'docker-compose.log'\n"
+	@docker compose -f srcs/docker-compose.yml up --build -d 2>&1 | tee -a docker-compose.log | bar > /dev/null
 
 	@echo "$(SEP)"
 	@cat docker-compose.log | tail -n 3
 
 down:
-	@docker-compose -f srcs/docker-compose.yaml down
+	@docker compose -f srcs/docker-compose.yml down
 
 # Stops the running processes using any NGINX, MARIADB, WORDPRESS (original/custom) image.
 stop:
