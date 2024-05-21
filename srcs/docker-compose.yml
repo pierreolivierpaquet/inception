@@ -82,6 +82,16 @@ services:
       context: ./requirements/wordpress/
       dockerfile: Dockerfile
     image: wordpress-build:inception
+    secrets:
+      - ${DB_NAME_SECRET}
+      - ${DB_USER_SECRET}
+      - ${DB_PW_USER_SECRET}
+    environment:
+      - DB_NAME_FILE=${DB_NAME_FILE}
+      - DB_USER_FILE=${DB_USER_FILE}
+      - DB_PW_USER_FILE=${DB_PW_USER_FILE}
+      - DB_HOSTNAME=${DB_HOSTNAME}
+      - WP_CONFIG_FILE_PATH=${WP_CONFIG_FILE_PATH}
     container_name: wordpress
     restart: always
     # Only allows inter-container communications. (Not with HOST)
