@@ -13,5 +13,7 @@ COPY config/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 COPY tools/wordpress_installation.sh /usr/local/bin/wordpress_installation.sh
 RUN chmod +x /usr/local/bin/wordpress_installation.sh
 
+ENTRYPOINT ["/usr/local/bin/wordpress_installation.sh"]
+
 # < -F > to run the process in the foreground.
 CMD ["php-fpm7.4", "-F"]

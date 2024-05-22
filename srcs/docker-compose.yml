@@ -50,6 +50,12 @@ secrets:
     file: ../secrets/${DB_PW_USER_SECRET}
   db_pw_root:
     file: ../secrets/${DB_PW_ROOT_SECRET}
+  wp_admin_user:
+    file: ../secrets/${WP_ADMIN_USER_SECRET}
+  wp_pw_admin_user:
+    file: ../secrets/${WP_PW_ADMIN_USER_SECRET}
+  wp_email_admin_user:
+    file: ../secrets/${WP_EMAIL_ADMIN_USER_SECRET}
 
 # ---------------------------------------------------------------------------- #
 
@@ -86,12 +92,20 @@ services:
       - ${DB_NAME_SECRET}
       - ${DB_USER_SECRET}
       - ${DB_PW_USER_SECRET}
+      - ${WP_ADMIN_USER_SECRET}
+      - ${WP_PW_ADMIN_USER_SECRET}
+      - ${WP_EMAIL_ADMIN_USER_SECRET}
     environment:
       - DB_NAME_FILE=${DB_NAME_FILE}
       - DB_USER_FILE=${DB_USER_FILE}
       - DB_PW_USER_FILE=${DB_PW_USER_FILE}
       - DB_HOSTNAME=${DB_HOSTNAME}
       - WP_CONFIG_FILE_PATH=${WP_CONFIG_FILE_PATH}
+      - WP_ADMIN_USER_FILE=${WP_ADMIN_USER_FILE}
+      - WP_PW_ADMIN_USER_FILE=${WP_PW_ADMIN_USER_FILE}
+      - WP_DOMAIN_NAME=${WP_DOMAIN_NAME}
+      - WP_TITLE=${WP_TITLE}
+      - WP_EMAIL_ADMIN_USER_FILE=${WP_EMAIL_ADMIN_USER_FILE}
     container_name: wordpress
     restart: always
     # Only allows inter-container communications. (Not with HOST)

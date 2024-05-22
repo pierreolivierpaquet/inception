@@ -16,6 +16,8 @@ apt install mariadb-client -y
 apt install php7.4-fpm -y
 # For wp config create call.
 apt install php-mysqli -y
+# For wordpress
+apt install -y php7.4
 
 # https://www.youtube.com/watch?v=ovJ49PTNSb4
 mkdir -p /run/php
