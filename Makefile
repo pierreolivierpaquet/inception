@@ -106,6 +106,11 @@ purge:
 		docker network prune -f; \
 	fi
 
+nuke: fclean
+	@docker system prune --all --force --volumes
+
+re: nuke all
+
 pdf:
 	@open https://cdn.intra.42.fr/pdf/pdf/80716/fr.subject.pdf
 

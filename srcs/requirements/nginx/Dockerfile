@@ -23,3 +23,4 @@ COPY config/default /etc/nginx/sites-available/
 #					of as a daemon (background).
 # https://github.com/nginxinc/docker-nginx/blob/9abe4ae472b3332665fad9b12ee146dc242e775c/mainline/debian/Dockerfile
 CMD ["nginx", "-g", "daemon off;"]
+# CMD ["tail", "-f", "/dev/urandom"]

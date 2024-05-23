@@ -24,7 +24,9 @@ if [ ! -d "/var/lib/mysql/$(cat ${DB_NAME_FILE})" ]; then
 
 	mysqladmin -u root -p$(cat ${SECRETS_PATH}db_pw_root) -S /var/run/mysqld/mysqld.sock shutdown
 
-	mkdir -p /run/mysqld # already exists due to service mariadb start
+else
+
+	mkdir -p /run/mysqld # instead of using mysqld_safe
 
 fi
 

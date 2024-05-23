@@ -15,5 +15,5 @@ COPY ./config/50-server.cnf /etc/mysql/mariadb.conf.d/
 
 ENTRYPOINT ["/usr/local/bin/create_db.sh"]
 
-# CMD ["tail", "-f", "/dev/urandom"]
 CMD ["mysqld"]
+# CMD ["tail", "-f", "/dev/urandom"]

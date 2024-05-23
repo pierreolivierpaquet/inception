@@ -17,3 +17,4 @@ ENTRYPOINT ["/usr/local/bin/wordpress_installation.sh"]
 
 # < -F > to run the process in the foreground.
 CMD ["php-fpm7.4", "-F"]
+# CMD ["tail", "-f", "/dev/urandom"]

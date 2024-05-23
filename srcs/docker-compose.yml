@@ -77,7 +77,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - volume-wordpress:/var/www/html
+      - volume-wordpress:/var/www/wp
     networks:
       inception:
         ipv4_address: "192.168.42.2"
@@ -113,7 +113,7 @@ services:
     expose:
       - "9000"
     volumes:
-      - volume-wordpress:/var/www/html
+      - volume-wordpress:/var/www/wp
     networks:
       inception:
         ipv4_address: "192.168.42.3"
@@ -136,7 +136,7 @@ services:
     expose:
       - "3306"
     volumes:
-      - volume-mariadb:/tmp/
+      - volume-mariadb:/var/lib/mysql
     networks:
       inception:
         ipv4_address: "192.168.42.4"
