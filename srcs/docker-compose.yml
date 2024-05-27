@@ -129,8 +129,14 @@ services:
       - ${DB_USER_SECRET}
       - ${DB_PW_USER_SECRET}
       - ${DB_PW_ROOT_SECRET}
-    env_file:
-      - ./.env
+    # env_file:
+    #   - ./.env
+    environment:
+      - DB_NAME_FILE=${DB_NAME_FILE}
+      - DB_USER_FILE=${DB_USER_FILE}
+      - DB_PW_USER_FILE=${DB_PW_USER_FILE}
+      - DB_PW_ROOT_FILE=${DB_PW_ROOT_FILE}
+      - SECRETS_PATH=${SECRETS_PATH}
     container_name: mariadb
     restart: always
     expose:

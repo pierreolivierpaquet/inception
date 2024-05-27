@@ -26,6 +26,10 @@ server {
 	#
 	# listen 443 ssl default_server;
 	# listen [::]:443 ssl default_server;
+	# ssl_certificate		/etc/nginx/ssl/.inception.crt;
+	# ssl_certificate_key	/etc/nginx/ssl/.inception.key;
+	# ssl_protocols		TLSv1.2 TLSv1.3;
+
 	#
 	# Note: You should disable gzip for SSL traffic.
 	# See: https://bugs.debian.org/773332
@@ -38,12 +42,14 @@ server {
 	#
 	# include snippets/snakeoil.conf;
 
+
 	root /var/www/wp;
 
 	# Add index.php to the list if you are using PHP
 	index index.php index.html index.htm index.nginx-debian.html;
 
-	server_name _;
+	# Added: /etc/hosts -> "127.0.0.1 	ppaquet.42.fr"
+	server_name ppaquet.42.fr;
 
 	location / {
 		# First attempt to serve request as file, then
