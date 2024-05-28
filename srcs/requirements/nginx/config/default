@@ -49,7 +49,7 @@ server {
 	index index.php index.html index.htm index.nginx-debian.html;
 
 	# Added: /etc/hosts -> "127.0.0.1 	ppaquet.42.fr"
-	server_name ppaquet.42.fr;
+	server_name _;
 
 	location / {
 		# First attempt to serve request as file, then

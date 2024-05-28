@@ -114,11 +114,15 @@ re: nuke all
 pdf:
 	@open https://cdn.intra.42.fr/pdf/pdf/80716/fr.subject.pdf
 
+deletedata:
+	@sudo rm -rf /home/ppaquet/data/volume-mariadb/*
+	@sudo rm -rf /home/ppaquet/data/volume-wordpress/*
+
 .PHONY: all up down clean fclean purge
 
 # ---------------------------------------------------------------------------- #
 #
-# 1.	Add a rule which makes sure that the data/volume-* directoroies exists
+# 1.	Add a rule which makes sure that the data/volume-* directories exists
 #		(volume-wordpress, volume-mariadb)
 #
 #
