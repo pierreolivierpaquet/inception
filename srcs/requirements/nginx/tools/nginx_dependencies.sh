@@ -27,11 +27,12 @@ SSL_SUBJECT="\
 SSL_FOLDER="/etc/nginx/ssl/"; \
 SSL_KEYOUT="${SSL_FOLDER}.inception.key"; \
 SSL_CRTOUT="${SSL_FOLDER}.inception.crt"; \
-openssl	req -x509 \
-			-nodes \
+openssl	req -new \
+			-newkey rsa:2048 \
+			-x509 \
+			-sha256 \
 			-days 365 \
-			-newkey rsa:4096 \
-			-sha3-512 \
-			-keyout ${SSL_KEYOUT} \
+			-nodes \
 			-out ${SSL_CRTOUT} \
+			-keyout ${SSL_KEYOUT} \
 			-subj	${SSL_SUBJECT}

@@ -75,7 +75,7 @@ services:
     restart: on-failure:5
     # Allows HOST to communicate with container.
     ports:
-      - "8080:80"
+      - "443:443"
     volumes:
       - volume-wordpress:/var/www/wp
     networks:

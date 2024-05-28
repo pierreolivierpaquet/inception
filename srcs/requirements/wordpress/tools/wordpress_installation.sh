@@ -27,7 +27,7 @@ cd ${WP_CONFIG_FILE_PATH} \
 # https://make.wordpress.org/cli/handbook/guides/quick-start/
 wp core install	--allow-root \
 				--path=${WP_CONFIG_FILE_PATH} \
-				--url=ppaquet.42.fr \
+				--url='ppaquet.42.fr' \
 				--title=${WP_TITLE} \
 				--admin_user=$(cat ${WP_ADMIN_USER_FILE}) \
 				--admin_password=$(cat ${WP_PW_ADMIN_USER_FILE}) \
