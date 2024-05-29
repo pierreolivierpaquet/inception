@@ -21,14 +21,15 @@ check_db_connection() {
 }
 
 # Attempts to connect to database.
-for TRIES in {1..25}
+for TRIES in {1..10}
 do
 	if check_db_connection
 	then
+		sleep 10
 		break
 	fi
 	echo "attemp(s) to connect to database: ${TRIES}"
-	sleep 2
+	sleep 5
 done
 
 if [ ! -f "${WP_CONFIG_FILE_PATH}/wp-config.php" ]; then \
