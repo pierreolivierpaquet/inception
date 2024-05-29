@@ -14,7 +14,7 @@ cd /usr/local/bin \
 wp core download	--allow-root \
 					--path=${WP_CONFIG_FILE_PATH}
 
-# Function to check database connection.
+# Checking connection to database.
 check_db_connection() {
     mysql -h${DB_HOSTNAME} -u$(cat ${DB_USER_FILE}) -p$(cat ${DB_PW_USER_FILE}) -e "show databases;"
     return $?
@@ -46,7 +46,7 @@ if [ ! -f "${WP_CONFIG_FILE_PATH}/wp-config.php" ]; then \
 	# https://make.wordpress.org/cli/handbook/guides/quick-start/
 	wp core install	--allow-root \
 					--path=${WP_CONFIG_FILE_PATH} \
-					--url=127.0.0.1:8080 \
+					--url="ppaquet.42.fr" \
 					--title=${WP_TITLE} \
 					--admin_user=$(cat ${WP_ADMIN_USER_FILE}) \
 					--admin_password=$(cat ${WP_PW_ADMIN_USER_FILE}) \

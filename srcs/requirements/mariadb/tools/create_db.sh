@@ -6,6 +6,17 @@ DB_INIT_FILE="/usr/local/bin/init.sql"
 # Current script automatically stops if any command returns a non-zero exit status.
 set -e
 
+# Waits for mariadb-server's complete installation before sending queries.
+for TRIES in {1..10}
+do
+	if [ -d "/var/lib/mysql/mysql" ]; then
+		sleep 5
+		break
+	fi
+	echo "Wating mariadb installation: ${TRIES}"
+	sleep 5
+done
+
 if [ ! -d "/var/lib/mysql/$(cat ${DB_NAME_FILE})" ]; then
 
 	service	mariadb start
