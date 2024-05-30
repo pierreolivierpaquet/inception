@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# Updates.
 apt update
 apt upgrade
-apt install net-tools -y
-apt install curl -y
-apt install vim -y
+
+# # Debugging tools.
+# apt install net-tools -y
+# apt install vim -y
+# apt install curl -y
 
 apt install mariadb-server -y

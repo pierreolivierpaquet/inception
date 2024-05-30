@@ -23,7 +23,6 @@ server {
 	# listen [::]:80 default_server;
 
 	# SSL configuration
-	#
 	listen 443 ssl default_server;
 	listen [::]:443 ssl default_server;
 
@@ -54,7 +53,8 @@ server {
 	location / {
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
-		try_files $uri $uri/ =404;
+		# try_files $uri $uri/ =404;
+		try_files $uri $uri/ /index.php$is_args$args;
 	}
 
 	# pass PHP scripts to FastCGI server
@@ -65,7 +65,7 @@ server {
 		# With php-fpm (or other unix sockets):
 		# fastcgi_pass unix:/run/php/php7.4-fpm.sock;
 		# With php-cgi (or other tcp sockets):
-		fastcgi_pass 192.168.42.3:9000; # could have been wordpress:9000
+		fastcgi_pass 192.168.42.3:9000;
 	}
 
 	# deny access to .htaccess files, if Apache's document root
@@ -75,7 +75,6 @@ server {
 	#	deny all;
 	#}
 }
-
 
 # Virtual Host configuration for example.com
 #

@@ -7,7 +7,7 @@ DB_INIT_FILE="/usr/local/bin/init.sql"
 set -e
 
 # Waits for mariadb-server's complete installation before sending queries.
-for TRIES in {1..10}
+for TRIES in {1..25}
 do
 	if [ -d "/var/lib/mysql/mysql" ]; then
 		sleep 5

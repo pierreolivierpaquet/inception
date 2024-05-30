@@ -1,10 +1,14 @@
 #!/bin/sh
 
+# Updates.
 apt	update
 apt	upgrade
-apt	install net-tools -y
-apt	install curl -y
-apt	install vim -y
+
+# # Debugging tools.
+# apt	install net-tools -y
+# apt	install curl -y
+# apt	install vim -y
+
 apt	install nginx -y
 
 # https://www.youtube.com/watch?v=X3Pr5VATOyA
