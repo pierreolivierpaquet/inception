@@ -26,15 +26,15 @@ SSL_SUBJECT="\
 /L=Quebec\
 /O=42Quebec\
 /OU=QuebecNumerique\
-/CN=ppaquet.42.fr\
-/emailAddress=peopaquet@gmail.com"; \
+/CN=${WP_DOMAIN_NAME}\
+/emailAddress=$(cat ${WP_EMAIL_ADMIN_USER_FILE})"; \
 SSL_FOLDER="/etc/nginx/ssl/"; \
 SSL_KEYOUT="${SSL_FOLDER}.inception.key"; \
 SSL_CRTOUT="${SSL_FOLDER}.inception.crt"; \
 openssl	req -new \
-			-newkey rsa:2048 \
+			-newkey rsa:4096 \
 			-x509 \
-			-sha256 \
+			-sha3-512 \
 			-days 365 \
 			-nodes \
 			-out ${SSL_CRTOUT} \

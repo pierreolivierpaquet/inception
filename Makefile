@@ -4,12 +4,12 @@ SEP := "------------------------------------------------------------------------
 all: up
 
 up:
-	@if [ ! -d /home/ppaquet/data/volume-wordpress ]; then \
+	@if [ ! -d ~/data/volume-wordpress ]; then \
 		mkdir -p ~/data/volume-wordpress; \
 		echo "volume-wordpress created."; \
 	fi
 
-	@if [ ! -d /home/ppaquet/data/volume-mariadb ]; then \
+	@if [ ! -d ~/data/volume-mariadb ]; then \
 		mkdir -p ~/data/volume-wordpress; \
 		echo "volume-wordpress created."; \
 	fi
@@ -118,14 +118,61 @@ deletedata:
 	@sudo rm -rf /home/ppaquet/data/volume-mariadb/*
 	@sudo rm -rf /home/ppaquet/data/volume-wordpress/*
 
-.PHONY: all up down clean fclean purge
+envgen:
+	@if [ ! -f ./srcs/.env ]; then \
+		echo "Generating '.env' file."; \
+		touch ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_DOMAIN_NAME="$${LOGNAME}.42.fr"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_CONFIG_FILE_PATH="/var/www/wp"' >> ./srcs/.env; \
+		echo 'WP_TITLE="Inception"' >> ./srcs/.env ; \
+		echo '' >> ./srcs/.env; \
+		echo 'DB_HOSTNAME="mariadb"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo '# IPAM' >> ./srcs/.env; \
+		echo 'INCEPTION_SUBNET="192.168.0.0/16"' >> ./srcs/.env; \
+		echo 'INCEPTION_GATEWAY="192.168.0.1"' >> ./srcs/.env; \
+		echo 'NGINX_HOSTIP="192.168.42.2"' >> ./srcs/.env; \
+		echo 'WP_HOSTIP="192.168.42.3"' >> ./srcs/.env; \
+		echo 'DB_HOSTIP="192.168.42.4"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo '# SECRETS' >> ./srcs/.env; \
+		echo 'SECRETS_PATH_HOST="../secrets/"' >> ./srcs/.env; \
+		echo 'SECRETS_PATH="/run/secrets/"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'DB_NAME_SECRET="db_name"' >> ./srcs/.env; \
+		echo 'DB_NAME_FILE="$${SECRETS_PATH}$${DB_NAME_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'DB_USER_SECRET="db_user"' >> ./srcs/.env; \
+		echo 'DB_USER_FILE="$${SECRETS_PATH}$${DB_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'DB_PW_ROOT_SECRET="db_pw_root"' >> ./srcs/.env; \
+		echo 'DB_PW_ROOT_FILE="$${SECRETS_PATH}$${DB_PW_ROOT_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'DB_PW_USER_SECRET="db_pw_user"' >> ./srcs/.env; \
+		echo 'DB_PW_USER_FILE="$${SECRETS_PATH}$${DB_PW_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_USER_SECRET="wp_user"' >> ./srcs/.env; \
+		echo 'WP_USER_FILE="$${SECRETS_PATH}$${WP_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_PW_USER_SECRET="wp_pw_user"' >> ./srcs/.env; \
+		echo 'WP_PW_USER_FILE="$${SECRETS_PATH}$${WP_PW_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_ADMIN_USER_SECRET="wp_admin_user"' >> ./srcs/.env; \
+		echo 'WP_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_PW_ADMIN_USER_SECRET="wp_pw_admin_user"' >> ./srcs/.env; \
+		echo 'WP_PW_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_PW_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_EMAIL_USER_SECRET="wp_email_user"' >> ./srcs/.env; \
+		echo 'WP_EMAIL_USER_FILE="$${SECRETS_PATH}$${WP_EMAIL_USER_SECRET}"' >> ./srcs/.env; \
+		echo '' >> ./srcs/.env; \
+		echo 'WP_EMAIL_ADMIN_USER_SECRET="wp_email_admin_user"' >> ./srcs/.env; \
+		echo 'WP_EMAIL_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_EMAIL_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
+	fi
 
-# ---------------------------------------------------------------------------- #
-#
-# 1.	Add a rule which makes sure that the data/volume-* directories exists
-#		(volume-wordpress, volume-mariadb)
-#
-#
-#
-#
-#
+envdel:
+	@rm -rf ./srcs/.env
+
+.PHONY: all up down clean fclean purge

@@ -11,7 +11,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/ppaquet/data/volume-wordpress
+      device: ~/data/volume-wordpress
       o: bind
 
   volume-mariadb:
@@ -19,7 +19,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/ppaquet/data/volume-mariadb
+      device: ~/data/volume-mariadb
       o: bind
 
 # ---------------------------------------------------------------------------- #
@@ -35,38 +35,38 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "192.168.0.0/16"
-          gateway: "192.168.0.1"
+        - subnet: ${INCEPTION_SUBNET}
+          gateway: ${INCEPTION_GATEWAY}
 
 # ---------------------------------------------------------------------------- #
 # https://docs.docker.com/compose/use-secrets/
 
 secrets:
   db_name:
-    file: ../secrets/${DB_NAME_SECRET}
+    file: ${SECRETS_PATH_HOST}${DB_NAME_SECRET}
   db_user:
-    file: ../secrets/${DB_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${DB_USER_SECRET}
   db_pw_user:
-    file: ../secrets/${DB_PW_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${DB_PW_USER_SECRET}
   db_pw_root:
-    file: ../secrets/${DB_PW_ROOT_SECRET}
+    file: ${SECRETS_PATH_HOST}${DB_PW_ROOT_SECRET}
   wp_user:
-    file: ../secrets/${WP_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_USER_SECRET}
   wp_pw_user:
-    file: ../secrets/${WP_PW_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_PW_USER_SECRET}
   wp_admin_user:
-    file: ../secrets/${WP_ADMIN_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_ADMIN_USER_SECRET}
   wp_pw_admin_user:
-    file: ../secrets/${WP_PW_ADMIN_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_PW_ADMIN_USER_SECRET}
   wp_email_user:
-    file: ../secrets/${WP_EMAIL_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_EMAIL_USER_SECRET}
   wp_email_admin_user:
-    file: ../secrets/${WP_EMAIL_ADMIN_USER_SECRET}
+    file: ${SECRETS_PATH_HOST}${WP_EMAIL_ADMIN_USER_SECRET}
 
 # ---------------------------------------------------------------------------- #
 
 services:
-
+  # https://hub.docker.com/_/nginx
   nginx:
     build:
       # Where the Dockerfile is located.
@@ -74,11 +74,16 @@ services:
       # Dockerfile name *not required if already named 'Dockerfile'.
       dockerfile: Dockerfile
     # Custom name for the image being built.
-    image: nginx-build:inception
+    image: nginx:inception
     # Prevents that directory name be append to the service's name
     # (when executing 'docker-compose' without specifying -f <path>)
+    secrets:
+      - ${WP_EMAIL_ADMIN_USER_SECRET}
+    environment:
+      - WP_DOMAIN_NAME=${WP_DOMAIN_NAME}
+      - WP_EMAIL_ADMIN_USER_FILE=${WP_EMAIL_ADMIN_USER_FILE}
     container_name: nginx
-    restart: on-failure:5
+    restart: on-failure:10
     # Allows HOST to communicate with container.
     ports:
       - "443:443"
@@ -86,14 +91,14 @@ services:
       - volume-wordpress:/var/www/wp
     networks:
       inception:
-        ipv4_address: "192.168.42.2"
+        ipv4_address: ${NGINX_HOSTIP}
 
-# https://hub.docker.com/_/wordpress
+  # https://hub.docker.com/_/wordpress
   wordpress:
     build:
       context: ./requirements/wordpress/
       dockerfile: Dockerfile
-    image: wordpress-build:inception
+    image: wordpress:inception
     secrets:
       - ${DB_NAME_SECRET}
       - ${DB_USER_SECRET}
@@ -119,7 +124,7 @@ services:
       - WP_EMAIL_USER_FILE=${WP_EMAIL_USER_FILE}
       - WP_EMAIL_ADMIN_USER_FILE=${WP_EMAIL_ADMIN_USER_FILE}
     container_name: wordpress
-    restart: always
+    restart: on-failure:10
     # Only allows inter-container communications. (Not with HOST)
     # Exposes ports from a service to other services in the same Docker network.
     expose:
@@ -128,21 +133,19 @@ services:
       - volume-wordpress:/var/www/wp
     networks:
       inception:
-        ipv4_address: "192.168.42.3"
+        ipv4_address: ${WP_HOSTIP}
 
-# https://hub.docker.com/_/mariadb
+  # https://hub.docker.com/_/mariadb
   mariadb:
     build:
       context: ./requirements/mariadb/
       dockerfile: Dockerfile
-    image: mariadb-build:inception
+    image: mariadb:inception
     secrets:
       - ${DB_NAME_SECRET}
       - ${DB_USER_SECRET}
       - ${DB_PW_USER_SECRET}
       - ${DB_PW_ROOT_SECRET}
-    # env_file:
-    #   - ./.env
     environment:
       - DB_NAME_FILE=${DB_NAME_FILE}
       - DB_USER_FILE=${DB_USER_FILE}
@@ -150,11 +153,11 @@ services:
       - DB_PW_ROOT_FILE=${DB_PW_ROOT_FILE}
       - SECRETS_PATH=${SECRETS_PATH}
     container_name: mariadb
-    restart: always
+    restart: on-failure:10
     expose:
       - "3306"
     volumes:
       - volume-mariadb:/var/lib/mysql
     networks:
       inception:
-        ipv4_address: "192.168.42.4"
+        ipv4_address: ${DB_HOSTIP}

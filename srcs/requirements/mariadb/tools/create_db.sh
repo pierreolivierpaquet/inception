@@ -23,9 +23,10 @@ if [ ! -d "/var/lib/mysql/$(cat ${DB_NAME_FILE})" ]; then
 
 	touch ${DB_INIT_FILE}
 	echo	"CREATE DATABASE IF NOT EXISTS \`$(cat ${DB_NAME_FILE})\`;" >> ${DB_INIT_FILE}
-	echo	"CREATE USER IF NOT EXISTS \`$(cat ${DB_USER_FILE})\`@'192.168.42.3' \
+	echo	"CREATE USER IF NOT EXISTS \`$(cat ${DB_USER_FILE})\`@'${WP_HOSTIP}' \
 			IDENTIFIED BY '$(cat ${DB_PW_USER_FILE})';" >> ${DB_INIT_FILE}
-	echo	"GRANT ALL PRIVILEGES ON \`$(cat ${DB_NAME_FILE})\`.* TO \`$(cat ${DB_USER_FILE})\`@'192.168.42.3' \
+	# https://stackoverflow.com/questions/5016505/mysql-grant-all-privileges-on-database
+	echo	"GRANT ALL PRIVILEGES ON \`$(cat ${DB_NAME_FILE})\`.* TO \`$(cat ${DB_USER_FILE})\`@'${WP_HOSTIP}' \
 			IDENTIFIED BY '$(cat ${DB_PW_USER_FILE})' WITH GRANT OPTION;" >> ${DB_INIT_FILE}
 
 	# https://www.ibm.com/docs/en/spectrum-lsf-rtm/10.2.0?topic=ssl-configuring-default-root-password-mysqlmariadb
