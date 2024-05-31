@@ -54,14 +54,14 @@ secrets:
     file: ${SECRETS_PATH_HOST}${WP_USER_SECRET}
   wp_pw_user:
     file: ${SECRETS_PATH_HOST}${WP_PW_USER_SECRET}
-  wp_admin_user:
-    file: ${SECRETS_PATH_HOST}${WP_ADMIN_USER_SECRET}
-  wp_pw_admin_user:
-    file: ${SECRETS_PATH_HOST}${WP_PW_ADMIN_USER_SECRET}
+  wp_admin:
+    file: ${SECRETS_PATH_HOST}${WP_ADMIN_SECRET}
+  wp_pw_admin:
+    file: ${SECRETS_PATH_HOST}${WP_PW_ADMIN_SECRET}
   wp_email_user:
     file: ${SECRETS_PATH_HOST}${WP_EMAIL_USER_SECRET}
-  wp_email_admin_user:
-    file: ${SECRETS_PATH_HOST}${WP_EMAIL_ADMIN_USER_SECRET}
+  wp_email_admin:
+    file: ${SECRETS_PATH_HOST}${WP_EMAIL_ADMIN_SECRET}
 
 # ---------------------------------------------------------------------------- #
 
@@ -78,10 +78,10 @@ services:
     # Prevents that directory name be append to the service's name
     # (when executing 'docker-compose' without specifying -f <path>)
     secrets:
-      - ${WP_EMAIL_ADMIN_USER_SECRET}
+      - ${WP_EMAIL_ADMIN_SECRET}
     environment:
       - WP_DOMAIN_NAME=${WP_DOMAIN_NAME}
-      - WP_EMAIL_ADMIN_USER_FILE=${WP_EMAIL_ADMIN_USER_FILE}
+      - WP_EMAIL_ADMIN_FILE=${WP_EMAIL_ADMIN_FILE}
     container_name: nginx
     restart: on-failure:10
     # Allows HOST to communicate with container.
@@ -105,10 +105,10 @@ services:
       - ${DB_PW_USER_SECRET}
       - ${WP_USER_SECRET}
       - ${WP_PW_USER_SECRET}
-      - ${WP_ADMIN_USER_SECRET}
-      - ${WP_PW_ADMIN_USER_SECRET}
+      - ${WP_ADMIN_SECRET}
+      - ${WP_PW_ADMIN_SECRET}
       - ${WP_EMAIL_USER_SECRET}
-      - ${WP_EMAIL_ADMIN_USER_SECRET}
+      - ${WP_EMAIL_ADMIN_SECRET}
     environment:
       - DB_NAME_FILE=${DB_NAME_FILE}
       - DB_USER_FILE=${DB_USER_FILE}
@@ -117,12 +117,12 @@ services:
       - WP_CONFIG_FILE_PATH=${WP_CONFIG_FILE_PATH}
       - WP_USER_FILE=${WP_USER_FILE}
       - WP_PW_USER_FILE=${WP_PW_USER_FILE}
-      - WP_ADMIN_USER_FILE=${WP_ADMIN_USER_FILE}
-      - WP_PW_ADMIN_USER_FILE=${WP_PW_ADMIN_USER_FILE}
+      - WP_ADMIN_FILE=${WP_ADMIN_FILE}
+      - WP_PW_ADMIN_FILE=${WP_PW_ADMIN_FILE}
       - WP_DOMAIN_NAME=${WP_DOMAIN_NAME}
       - WP_TITLE=${WP_TITLE}
       - WP_EMAIL_USER_FILE=${WP_EMAIL_USER_FILE}
-      - WP_EMAIL_ADMIN_USER_FILE=${WP_EMAIL_ADMIN_USER_FILE}
+      - WP_EMAIL_ADMIN_FILE=${WP_EMAIL_ADMIN_FILE}
     container_name: wordpress
     restart: on-failure:10
     # Only allows inter-container communications. (Not with HOST)

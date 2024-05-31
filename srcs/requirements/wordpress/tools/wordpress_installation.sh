@@ -50,9 +50,9 @@ if [ ! -f "${WP_CONFIG_FILE_PATH}/wp-config.php" ]; then \
 					--path=${WP_CONFIG_FILE_PATH} \
 					--url=${WP_DOMAIN_NAME} \
 					--title=${WP_TITLE} \
-					--admin_user=$(cat ${WP_ADMIN_USER_FILE}) \
-					--admin_password=$(cat ${WP_PW_ADMIN_USER_FILE}) \
-					--admin_email=$(cat ${WP_EMAIL_ADMIN_USER_FILE})
+					--admin_user=$(cat ${WP_ADMIN_FILE}) \
+					--admin_password=$(cat ${WP_PW_ADMIN_FILE}) \
+					--admin_email=$(cat ${WP_EMAIL_ADMIN_FILE})
 
 	# Creation of a new user.
 	#	https://developer.wordpress.org/cli/commands/user/create/

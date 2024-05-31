@@ -1,9 +1,13 @@
 
 SEP := "--------------------------------------------------------------------------------------------"
 
+SRCS_PATH	:=	./srcs/
+ENVIRONMENT_FILE	:=	$(SRCS_PATH).env
+SECRETS				:=	./secrets
+
 all: up
 
-up:
+up: $(ENVIRONMENT_FILE) secrets
 	@if [ ! -d ~/data/volume-wordpress ]; then \
 		mkdir -p ~/data/volume-wordpress; \
 		echo "volume-wordpress created."; \
@@ -82,7 +86,7 @@ fclean: clean
 		rm docker-compose.log; \
 	fi
 
-# Destroys all processes, removes all image(s), custom network(s), volume(s).
+# Destroys ALL processes, removes ALL image(s), custom network(s), volume(s).
 purge:
 	@if [ -n "$(shell docker ps -qa)" ]; then \
 		echo "$(SEP)"; \
@@ -106,7 +110,7 @@ purge:
 		docker network prune -f; \
 	fi
 
-nuke: fclean
+nuke: fclean purge delete_env delete_secrets delete_data
 	@docker system prune --all --force --volumes
 
 re: nuke all
@@ -114,65 +118,132 @@ re: nuke all
 pdf:
 	@open https://cdn.intra.42.fr/pdf/pdf/80716/fr.subject.pdf
 
-deletedata:
+delete_data:
 	@sudo rm -rf /home/ppaquet/data/volume-mariadb/*
 	@sudo rm -rf /home/ppaquet/data/volume-wordpress/*
 
-envgen:
-	@if [ ! -f ./srcs/.env ]; then \
-		echo "Generating '.env' file."; \
-		touch ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_DOMAIN_NAME="$${LOGNAME}.42.fr"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_CONFIG_FILE_PATH="/var/www/wp"' >> ./srcs/.env; \
-		echo 'WP_TITLE="Inception"' >> ./srcs/.env ; \
-		echo '' >> ./srcs/.env; \
-		echo 'DB_HOSTNAME="mariadb"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo '# IPAM' >> ./srcs/.env; \
-		echo 'INCEPTION_SUBNET="192.168.0.0/16"' >> ./srcs/.env; \
-		echo 'INCEPTION_GATEWAY="192.168.0.1"' >> ./srcs/.env; \
-		echo 'NGINX_HOSTIP="192.168.42.2"' >> ./srcs/.env; \
-		echo 'WP_HOSTIP="192.168.42.3"' >> ./srcs/.env; \
-		echo 'DB_HOSTIP="192.168.42.4"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo '# SECRETS' >> ./srcs/.env; \
-		echo 'SECRETS_PATH_HOST="../secrets/"' >> ./srcs/.env; \
-		echo 'SECRETS_PATH="/run/secrets/"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'DB_NAME_SECRET="db_name"' >> ./srcs/.env; \
-		echo 'DB_NAME_FILE="$${SECRETS_PATH}$${DB_NAME_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'DB_USER_SECRET="db_user"' >> ./srcs/.env; \
-		echo 'DB_USER_FILE="$${SECRETS_PATH}$${DB_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'DB_PW_ROOT_SECRET="db_pw_root"' >> ./srcs/.env; \
-		echo 'DB_PW_ROOT_FILE="$${SECRETS_PATH}$${DB_PW_ROOT_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'DB_PW_USER_SECRET="db_pw_user"' >> ./srcs/.env; \
-		echo 'DB_PW_USER_FILE="$${SECRETS_PATH}$${DB_PW_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_USER_SECRET="wp_user"' >> ./srcs/.env; \
-		echo 'WP_USER_FILE="$${SECRETS_PATH}$${WP_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_PW_USER_SECRET="wp_pw_user"' >> ./srcs/.env; \
-		echo 'WP_PW_USER_FILE="$${SECRETS_PATH}$${WP_PW_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_ADMIN_USER_SECRET="wp_admin_user"' >> ./srcs/.env; \
-		echo 'WP_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_PW_ADMIN_USER_SECRET="wp_pw_admin_user"' >> ./srcs/.env; \
-		echo 'WP_PW_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_PW_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_EMAIL_USER_SECRET="wp_email_user"' >> ./srcs/.env; \
-		echo 'WP_EMAIL_USER_FILE="$${SECRETS_PATH}$${WP_EMAIL_USER_SECRET}"' >> ./srcs/.env; \
-		echo '' >> ./srcs/.env; \
-		echo 'WP_EMAIL_ADMIN_USER_SECRET="wp_email_admin_user"' >> ./srcs/.env; \
-		echo 'WP_EMAIL_ADMIN_USER_FILE="$${SECRETS_PATH}$${WP_EMAIL_ADMIN_USER_SECRET}"' >> ./srcs/.env; \
+delete_env:
+	@rm -rf $(ENVIRONMENT_FILE)
+
+$(ENVIRONMENT_FILE):
+	@if [ ! -f $(ENVIRONMENT_FILE) ]; then \
+		echo "Generating '$(ENVIRONMENT_FILE)' file."; \
+		touch $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_DOMAIN_NAME="${LOGNAME}.42.fr"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_CONFIG_FILE_PATH="/var/www/wp"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_TITLE="Inception"' >> $(ENVIRONMENT_FILE) ; \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_HOSTNAME="mariadb"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo '# IPAM' >> $(ENVIRONMENT_FILE); \
+		echo 'INCEPTION_SUBNET="192.168.0.0/16"' >> $(ENVIRONMENT_FILE); \
+		echo 'INCEPTION_GATEWAY="192.168.0.1"' >> $(ENVIRONMENT_FILE); \
+		echo 'NGINX_HOSTIP="192.168.42.2"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_HOSTIP="192.168.42.3"' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_HOSTIP="192.168.42.4"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo '# SECRETS' >> $(ENVIRONMENT_FILE); \
+		echo 'SECRETS_PATH_HOST="../secrets/"' >> $(ENVIRONMENT_FILE); \
+		echo 'SECRETS_PATH="/run/secrets/"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_NAME_SECRET="db_name"' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_NAME_FILE="$${SECRETS_PATH}$${DB_NAME_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_USER_SECRET="db_user"' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_USER_FILE="$${SECRETS_PATH}$${DB_USER_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_PW_ROOT_SECRET="db_pw_root"' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_PW_ROOT_FILE="$${SECRETS_PATH}$${DB_PW_ROOT_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_PW_USER_SECRET="db_pw_user"' >> $(ENVIRONMENT_FILE); \
+		echo 'DB_PW_USER_FILE="$${SECRETS_PATH}$${DB_PW_USER_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_USER_SECRET="wp_user"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_USER_FILE="$${SECRETS_PATH}$${WP_USER_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_PW_USER_SECRET="wp_pw_user"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_PW_USER_FILE="$${SECRETS_PATH}$${WP_PW_USER_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_ADMIN_SECRET="wp_admin"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_ADMIN_FILE="$${SECRETS_PATH}$${WP_ADMIN_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_PW_ADMIN_SECRET="wp_pw_admin"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_PW_ADMIN_FILE="$${SECRETS_PATH}$${WP_PW_ADMIN_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_EMAIL_USER_SECRET="wp_email_user"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_EMAIL_USER_FILE="$${SECRETS_PATH}$${WP_EMAIL_USER_SECRET}"' >> $(ENVIRONMENT_FILE); \
+		echo '' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_EMAIL_ADMIN_SECRET="wp_email_admin"' >> $(ENVIRONMENT_FILE); \
+		echo 'WP_EMAIL_ADMIN_FILE="$${SECRETS_PATH}$${WP_EMAIL_ADMIN_SECRET}"' >> $(ENVIRONMENT_FILE); \
 	fi
 
-envdel:
-	@rm -rf ./srcs/.env
+
+delete_secrets:
+	@rm -rf $(SECRETS)
+
+DB_NAME				:=	$(shell echo -n ${LOGNAME} | tr '[:lower:]' '[:upper:]')_DB_NAME
+DB_USER				:=	$(shell echo -n ${LOGNAME} | tr '[:lower:]' '[:upper:]')_DB_USER
+DB_PW_ROOT			:=	$(shell cat /dev/urandom | tr -dc '!A-Z0-9' | head -c 10)
+DB_PW_USER			:=	$(shell cat /dev/urandom | tr -dc '!A-Z0-9' | head -c 10)
+WP_USER				:=	$(shell echo -n ${LOGNAME} | tr '[:lower:]' '[:upper:]')_WP_USER
+WP_PW_USER			:=	$(shell cat /dev/urandom | tr -dc '!A-Z0-9' | head -c 10)
+WP_ADMIN			:=	$(shell echo -n ${LOGNAME} | tr '[:lower:]' '[:upper:]')_
+WP_PW_ADMIN			:=	$(shell cat /dev/urandom | tr -dc '!A-Z0-9' | head -c 10)
+WP_EMAIL_USER		:=	${LOGNAME}.user@inception.ca
+WP_EMAIL_ADMIN		:=	${LOGNAME}.admin@inception.ca
+$(SECRETS): $(ENVIRONMENT_FILE)
+# Creates the Database name secret file.
+	@if [ ! -d $(SECRETS) ]; then mkdir $(SECRETS); fi
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^DB_NAME_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(DB_NAME) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^DB_USER_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(DB_USER) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^DB_PW_ROOT_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(DB_PW_ROOT) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^DB_PW_USER_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(DB_PW_USER) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_USER_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_USER) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_PW_USER_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_PW_USER) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_ADMIN_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_ADMIN) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_PW_ADMIN_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_PW_ADMIN) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_EMAIL_USER_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_EMAIL_USER) >> ./secrets/$$ARG; \
+	fi
+
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^WP_EMAIL_ADMIN_SECRET" | awk -F'=' '{print $$2}' | tr -d "\"") && \
+	if [ ! -f "./secrets/$$ARG" ]; then \
+		echo -n $(WP_EMAIL_ADMIN) >> ./secrets/$$ARG; \
+	fi
 
 .PHONY: all up down clean fclean purge
