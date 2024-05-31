@@ -19,7 +19,6 @@ chmod	700 /etc/nginx/ssl
 
 # Generating key and certificate.
 # https://www.openssl.org/docs/manmaster/man1/openssl-req.html
-# openssl	req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=CA/ST=Quebec/L=Quebec/O=42Quebec/OU=QuebecNumerique/CN=ppaquet.42.fr"
 SSL_SUBJECT="\
 /C=CA\
 /ST=Quebec\

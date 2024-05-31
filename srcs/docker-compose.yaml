@@ -1,6 +1,7 @@
 # https://docs.docker.com/compose/gettingstarted/
 # https://hackmd.io/@jpshafto/SJnFqs-Kd
 # https://stackoverflow.com/questions/42216017/docker-compose-restart-policy
+# https://stackoverflow.com/questions/22268952/what-is-the-difference-between-yaml-and-yml-extension
 
 #-------------------------------------------------------------------------------
 # https://kinsta.com/blog/docker-compose-volumes/
