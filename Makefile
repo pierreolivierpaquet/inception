@@ -2,17 +2,19 @@
 SEP	:=	"--------------------------------------------------------------------------------------"
 
 SRCS_PATH			:=	./srcs/
+REQUIREMENTS_PATH	:=	/requirements/
 ENVIRONMENT_FILE	:=	$(SRCS_PATH).env
 SECRETS				:=	./secrets
 DOCKER_COMPOSE_FILE	:=	$(SRCS_PATH)docker-compose.yaml
 DOCKER_COMPOSE_FILE_BACKUP	:=	$(SRCS_PATH).backup.yaml
 HOSTS_FILE			:=	/etc/hosts
 HOSTS_FILE_BACKUP	:=	/etc/.hosts_backup
-
+NGINX_CONFIG_FILE	:=	$(SRCS_PATH)$(REQUIREMENTS_PATH)nginx/config/default
+NGINX_CONFIG_FILE_BACKUP	:=	$(SRCS_PATH)$(REQUIREMENTS_PATH)nginx/config/.backup
 
 all: up
 
-up: $(ENVIRONMENT_FILE) secrets edit_yaml host
+up: $(ENVIRONMENT_FILE) secrets edit_yaml host nginx_config
 	@if [ ! -d ~/data/volume-wordpress ]; then \
 		mkdir -p ~/data/volume-wordpress; \
 		echo "volume-wordpress created."; \
@@ -38,6 +40,11 @@ host:
 		export ARG; \
 		sudo -E sh -c 'echo "127.0.0.1\t$$ARG"".42.fr" >> $(HOSTS_FILE)'; \
 	fi
+
+nginx_config: $(ENVIRONMENT_FILE)
+	@if [ ! -f $(NGINX_CONFIG_FILE_BACKUP) ]; then cp $(NGINX_CONFIG_FILE) $(NGINX_CONFIG_FILE_BACKUP); fi
+	@ARG=$$(cat $(ENVIRONMENT_FILE) | grep "^LOGIN" | awk -F'=' '{print $$2}' | tr -d "\"")'\.42\.fr' && \
+	sed -i "0,/server_name/s/server_name [^;]*/server_name $${ARG}/" $(NGINX_CONFIG_FILE)
 
 down:
 	@docker compose -f srcs/docker-compose.yaml down
@@ -127,11 +134,20 @@ purge:
 nuke: fclean purge delete_env delete_secrets delete_data
 	@docker system prune --all --force --volumes
 # Restores docker-compose.yaml file.
-	@rm -rf $(DOCKER_COMPOSE_FILE)
-	@mv $(DOCKER_COMPOSE_FILE_BACKUP) $(DOCKER_COMPOSE_FILE)
+	@if [ -f $(DOCKER_COMPOSE_FILE_BACKUP) ]; then \
+		rm -rf $(DOCKER_COMPOSE_FILE); \
+		mv $(DOCKER_COMPOSE_FILE_BACKUP) $(DOCKER_COMPOSE_FILE); \
+	fi
 #	Restores /etc/hosts file.
-	@sudo sh -c 'rm -rf $(HOSTS_FILE)'
-	@sudo sh -c 'mv $(HOSTS_FILE_BACKUP) $(HOSTS_FILE)'
+	@if [ -f $(HOSTS_FILE_BACKUP) ]; then \
+		sudo sh -c 'rm -rf $(HOSTS_FILE)'; \
+		sudo sh -c 'mv $(HOSTS_FILE_BACKUP) $(HOSTS_FILE)';\
+	fi
+#	Restores the nginx configuration file.
+	@if [ -f $(NGINX_CONFIG_FILE_BACKUP) ]; then \
+		rm -rf $(NGINX_CONFIG_FILE); \
+		mv $(NGINX_CONFIG_FILE_BACKUP) $(NGINX_CONFIG_FILE); \
+	fi
 
 re: nuke all
 

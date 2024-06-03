@@ -28,7 +28,7 @@ server {
 
 	ssl_certificate		/etc/nginx/ssl/.inception.crt;
 	ssl_certificate_key	/etc/nginx/ssl/.inception.key;
-	ssl_protocols		TLSv1.2 TLSv1.3;
+	ssl_protocols		TLSv1.3;
 
 	#
 	# Note: You should disable gzip for SSL traffic.
@@ -47,8 +47,7 @@ server {
 	# Add index.php to the list if you are using PHP
 	index index.php index.html index.htm index.nginx-debian.html;
 
-	# Added: /etc/hosts -> "127.0.0.1 	ppaquet.42.fr"
-	server_name ppaquet.42.fr;
+	server_name login.42.fr;
 
 	location / {
 		# First attempt to serve request as file, then
