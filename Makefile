@@ -398,16 +398,18 @@ edit_yaml:
 			sed -i "s/wp_email_admin/$$ARG/" $(DOCKER_COMPOSE_FILE);			\
 		fi
 
-# backup:
-# 	@	if [ -f ./.Makefile ]; then												\
-# 			cp Makefile .Makefile;												\
-# 		fi
+# For Makefile itself.
+backup:
+	@	if [ ! -f ./.Makefile ]; then											\
+			cp Makefile .Makefile;												\
+		fi
 
-# restore:
-# 	@	if [ -f ./.Makefile ]; then												\
-# 		rm Makefile;															\
-# 		mv .Makefile Makefile;													\
-# 	fi
+# Restores the Makefile to prevent persistent changes (ex: environment file).
+restore:
+	@	if [ -f ./.Makefile ]; then												\
+		rm Makefile;															\
+		mv .Makefile Makefile;													\
+	fi
 
 .PHONY: all up log host nginx_config down stop clean fclean purge nuke re		\
 		delete_data delete_env pdf $(ENVIRONMENT_FILE) delete_secrets $(SECRETS)\
